@@ -91,6 +91,6 @@ int     main(int argc, char **argv, char **envp)
         run_processes(&data, data);
     }
     else
-        exit(error_no_free("NOT ENOUGH ARGS\n", WRNG_ARGS));
+        exit(write(2, "NOT ENOUGH ARGS\n", 16));
     return (0);
 }

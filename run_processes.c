@@ -36,6 +36,8 @@ void    free_all(t_pipex **data_ptr)
         free((*data_ptr)->path1);
     if ((*data_ptr)->path2)
         free((*data_ptr)->path2);
+    close((*data_ptr)->fd[0]);
+    close((*data_ptr)->fd[1]);
 }
 
 char	*find_cmd_path(t_pipex **data_ptr, char *cmd, int i)
@@ -68,6 +70,8 @@ void    run_first_cmd(char **cmd, t_pipex **data_ptr, t_pipex *data, char **path
     if (dup2(data->infile, STDIN_FILENO) < 0 || dup2(data->fd[1], STDOUT_FILENO) < 0)
         exit(err_free_all(data_ptr, "Dup2 issue\n", DUP2_ERR));
     *path = find_cmd_path(data_ptr, cmd[0], 0);
+    if (*path == NULL)
+        exit(err_free_all(data_ptr, "Cmd1 not found\n", EXEC_ERR));
     write(2, "R_1st_Exec\n", 11);
     write(2, *path, ft_strlen(*path));
     write(2, "\n", 1);
@@ -85,6 +89,8 @@ void    run_last_cmd(char **cmd, t_pipex **data_ptr, t_pipex *data, char **path)
     if (dup2(data->fd[0], STDIN_FILENO) < 0 || dup2(data->outfile, STDOUT_FILENO) < 0)
         exit(err_free_all(data_ptr, "DUP2 error\n", DUP2_ERR));
     *path = find_cmd_path(data_ptr, cmd[0], 0);
+    if (*path == NULL)
+        exit(err_free_all(data_ptr, "Cmd2 not found\n", EXEC_ERR));
     write(2, "R_Exec\n", 7);
     write(2, *path, ft_strlen(*path));
     if (execve(*path, cmd, data->envp) < 0)
@@ -98,7 +104,7 @@ void    run_processes(t_pipex **data_ptr, t_pipex *data)
         run_first_cmd(data->cmd1, data_ptr, data, &(data->path1));
     else
     {
-        //waitpid(data->pid, NULL, WNOHANG);
+        waitpid(data->pid, NULL, 0);
         run_last_cmd(data->cmd2, data_ptr, data, &(data->path2));
     }
     close(data->fd[0]);
