@@ -64,6 +64,12 @@ t_pipex *init_pipex(t_pipex *data, char **argv, char **envp)
     if (data->multipath == NULL || data->cmd1 == NULL || data->cmd2 == NULL)
         exit(err_free_all(&data, "INVALID CMD1/CMD2 provided\n", NO_CMD));
     data->filename = argv[4];
+    data->path1 = find_cmd_path(&data, data->cmd1[0], 0);
+    if (data->path1 == NULL)
+        exit(err_free_all(&data, "Cmd1 not found\n", EXEC_ERR));
+    data->path2 = find_cmd_path(&data, data->cmd2[0], 0);
+    if (data->path2 == NULL)
+        exit(err_free_all(&data, "Cmd2 not found\n", EXEC_ERR));
     write(2, "Finished init\n", ft_strlen("Finished init\n"));
     return (data);
 }

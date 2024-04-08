@@ -38,6 +38,7 @@ typedef struct s_pipex
 }   t_pipex;
 
 t_pipex *init_pipex(t_pipex *data, char **argv, char **envp);
+char	*find_cmd_path(t_pipex **data_ptr, char *cmd, int i);
 void    run_processes(t_pipex **data_ptr, t_pipex *data);
 int     error_no_free(char *str, int err);
 int     error_ppx_free(t_pipex **data_ptr, char *str, int err);
