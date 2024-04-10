@@ -6,7 +6,7 @@
 /*   By: mpihur <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/06 17:00:08 by mpihur            #+#    #+#             */
-/*   Updated: 2024/04/06 17:00:26 by mpihur           ###   ########.fr       */
+/*   Updated: 2024/04/10 13:21:29 by mpihur           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ static void    free_split(char **split, int i)
         i++;
     }
     free(split);
-    write(2, "Split\n", 6);
+//    write(2, "Split\n", 6);
 }
 
 void    free_all(t_pipex **data_ptr)
@@ -45,7 +45,7 @@ char	*find_cmd_path(t_pipex **data_ptr, char *cmd, int i)
 	char	*temp;
 	char	*the_path;
 
-    write(2, "In find_cmd_path\n", ft_strlen("In find_cmd_path\n"));
+  //  write(2, "In find_cmd_path\n", ft_strlen("In find_cmd_path\n"));
 	while ((*data_ptr)->multipath[i])
 	{
 		temp = ft_strjoin((*data_ptr)->multipath[i], "/");
@@ -53,13 +53,13 @@ char	*find_cmd_path(t_pipex **data_ptr, char *cmd, int i)
 		free(temp);
 		if (access(the_path, F_OK | X_OK) == 0)
         {
-            write(2, "cmd found\n", ft_strlen("cmd found\n"));
+//            write(2, "cmd found\n", ft_strlen("cmd found\n"));
 			return (the_path);
         }
 		free(the_path);
 		i++;
 	}
-    write(2, "cmd not found\n", ft_strlen("cmd not found\n"));
+//    write(2, "cmd not found\n", ft_strlen("cmd not found\n"));
     return (NULL);
 }
 
@@ -69,7 +69,7 @@ static void    run_first_cmd(char **cmd, t_pipex **data_ptr, t_pipex *data)
     close(data->fd[0]);
     if (dup2(data->infile, STDIN_FILENO) < 0 || dup2(data->fd[1], STDOUT_FILENO) < 0)
         exit(err_free_all(data_ptr, "Dup2 issue\n", DUP2_ERR));
-    write(2, "R_1st_Exec\n", 11);
+  //  write(2, "R_1st_Exec\n", 11);
     if (execve(data->path1, cmd, data->envp) < 0)
         exit(err_free_all(data_ptr, "Execve issue\n", EXEC_ERR));
 }
@@ -83,7 +83,7 @@ static void    run_last_cmd(char **cmd, t_pipex **data_ptr, t_pipex *data)
         exit(err_free_all(data_ptr, "Outfile: OPEN ISSUE\n", FILE_NO_OPEN));
     if (dup2(data->fd[0], STDIN_FILENO) < 0 || dup2(data->outfile, STDOUT_FILENO) < 0)
         exit(err_free_all(data_ptr, "DUP2 error\n", DUP2_ERR));
-    write(2, "R_Exec\n", 7);
+  //  write(2, "R_Exec\n", 7);
     if (execve(data->path2, cmd, data->envp) < 0)
         exit(err_free_all(data_ptr, "EXECVE error\n", EXEC_ERR));
 }
@@ -95,7 +95,7 @@ void    run_processes(t_pipex **data_ptr, t_pipex *data)
         run_first_cmd(data->cmd1, data_ptr, data);
     else
     {
-        waitpid(data->pid, NULL, 0);
+        waitpid(data->pid, NULL, WNOHANG);
         run_last_cmd(data->cmd2, data_ptr, data);
     }
     close(data->fd[0]);
